@@ -22,3 +22,10 @@ For uniformly-distributed point data where the main access pattern is "give me e
 Bounding boxes are half-open: `[x0, x1) x [y0, y1)`. A point on the left or top edge of the root is inside; a point on the right or bottom edge is outside and will raise `ValueError` on insert. The same convention applies to `query`. This was chosen so that when a leaf splits, its four children tile the parent with no overlap and no gaps, and every point lands in exactly one child.
 
 Degenerate input is handled by `max_depth`: when a leaf reaches `max_depth` it stops splitting and accumulates points without bound. The default is 20, which bounds recursion even for many identical points.
+
+## Design notes
+
+The window stores values eagerly rather than keeping running aggregates. Running
+sums drift with floating point over long streams, and recomputing from a small
+buffer is cheap enough that the drift is not worth the speed.
+
